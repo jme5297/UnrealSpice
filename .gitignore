@@ -1,6 +1,9 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+# SPICE kernel files
+Content/SPICE_data/*
+
 # Visual Studio 2015 database file
 *.VC.db
 
@@ -27,6 +30,8 @@
 *.la
 *.a
 *.lib
+!ThirdParty/cspice64/lib/cspice.lib
+!ThirdParty/cspice64/lib/csupport.lib
 
 # Executables
 *.exe
