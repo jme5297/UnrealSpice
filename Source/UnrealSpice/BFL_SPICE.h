@@ -40,5 +40,11 @@ class UNREALSPICE_API UBFL_SPICE : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, Category = "SPICE")
 	static int GetNumberOfKernels();
+
+	UFUNCTION(BlueprintCallable, Category = "SPICE")
+	static FString GetKernelType(FString kname);
+
+	UFUNCTION(BlueprintCallable, Category = "SPICE")
+	static FString GetKernelArch(FString kname);
 	
 };

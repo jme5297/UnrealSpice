@@ -9,12 +9,33 @@ TArray<FString> UBFL_SPICE::GetAvailableKernels()
 {
 	TArray<FString>		AvailableKernels;
 	FString				spicedir;
+	FString				kernNameUE;
+	FString				p;
+	FString				f;
+	FString				e;
 
 	// Get the directory to the data folder
 	spicedir = FPaths::Combine(FPaths::ProjectDir(), FString("Content/SPICE_data/*"));
 
 	// Return list of files in the SPICE data folder
 	IFileManager::Get().FindFiles(AvailableKernels, *spicedir, true, false);
+
+	// Remove unnecessary kernels
+	for (int32 i = 0; i < AvailableKernels.Num(); i++)
+	{
+		// Get the absolute path of the kernel name.
+		kernNameUE = FPaths::Combine(FPaths::ProjectDir(), FString("Content/SPICE_data/"), AvailableKernels[i]);
+		kernNameUE = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*kernNameUE);
+
+		// Split directory, file, and extension
+		FPaths::Split(kernNameUE, p, f, e);
+
+		// If the file exists, then attempt to unload the kernel.
+		if (e.Equals("txt", ESearchCase::IgnoreCase))
+		{
+			AvailableKernels.RemoveAt(i);
+		}
+	}
 
 	return AvailableKernels;
 }
@@ -159,4 +180,48 @@ int UBFL_SPICE::GetNumberOfKernels()
 
 	ktotal_c("ALL", &count);
 	return count;
+}
+
+/*
+* Returns the type of a kernel.
+*/
+FString UBFL_SPICE::GetKernelType(FString kname)
+{
+	SpiceChar 		arch[128];
+	SpiceChar 		type[128];
+	FString			kernNameUE;
+
+	// Get the absolute path of the kernel name.
+	kernNameUE = FPaths::Combine(FPaths::ProjectDir(), FString("Content/SPICE_data/"), kname);
+	kernNameUE = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*kernNameUE);
+
+	// If the file exists, then attempt grab kernel information.
+	if (IFileManager::Get().FileExists(*kernNameUE))
+	{
+		getfat_c(TCHAR_TO_UTF8(*kernNameUE), 128, 128, arch, type);
+	}
+	
+	return FString(type);
+}
+
+/*
+* Returns the architecture of a kernel.
+*/
+FString UBFL_SPICE::GetKernelArch(FString kname)
+{
+	SpiceChar 		arch[128];
+	SpiceChar 		type[128];
+	FString			kernNameUE;
+
+	// Get the absolute path of the kernel name.
+	kernNameUE = FPaths::Combine(FPaths::ProjectDir(), FString("Content/SPICE_data/"), kname);
+	kernNameUE = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*kernNameUE);
+
+	// If the file exists, then attempt grab kernel information.
+	if (IFileManager::Get().FileExists(*kernNameUE))
+	{
+		getfat_c(TCHAR_TO_UTF8(*kernNameUE), 128, 128, arch, type);
+	}
+
+	return FString(arch);
 }
